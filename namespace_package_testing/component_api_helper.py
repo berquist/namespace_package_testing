@@ -14,16 +14,12 @@
 # ==============================================================================
 """Helper functions to help integrate TensorFlow components into TF API.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import importlib
 import os
 
 
 def package_hook(parent_package_str, child_package_str, error_msg=None):
-  """Used to hook in an external package into the TensorFlow namespace.
+    """Used to hook in an external package into the TensorFlow namespace.
 
   Example usage:
   ### tensorflow/__init__.py
@@ -51,36 +47,37 @@ def package_hook(parent_package_str, child_package_str, error_msg=None):
       of the parent.
     error_msg: Message to print if child package cannot be found.
   """
-  parent_pkg = importlib.import_module(parent_package_str)
-  try:
-    child_pkg = importlib.import_module(child_package_str)
-  except ImportError:
-    if error_msg:
-      print(error_msg)
-    return
+    parent_pkg = importlib.import_module(parent_package_str)
+    try:
+        child_pkg = importlib.import_module(child_package_str)
+    except ImportError:
+        if error_msg:
+            print(error_msg)
+        return
 
-  def set_child_as_subpackage():
-    """Sets child package as a subpackage of parent package.
+    def set_child_as_subpackage():
+        """Sets child package as a subpackage of parent package.
 
     Will allow the following import statement to work.
     >>> import parent.child
     """
-    child_pkg_path = [os.path.abspath(
-        os.path.join(os.path.dirname(child_pkg.__file__), ".."))]
-    try:
-      parent_pkg.__path__ = child_pkg_path + parent_pkg.__path__
-    except AttributeError:
-      parent_pkg.__path__ = child_pkg_path
+        child_pkg_path = [
+            os.path.abspath(os.path.join(os.path.dirname(child_pkg.__file__), ".."))
+        ]
+        try:
+            parent_pkg.__path__ = child_pkg_path + parent_pkg.__path__
+        except AttributeError:
+            parent_pkg.__path__ = child_pkg_path
 
-  def set_child_as_attr():
-    """Sets child package as a attr of the parent package.
+    def set_child_as_attr():
+        """Sets child package as a attr of the parent package.
 
     Will allow for the following.
     >>> import parent
     >>> parent.child
     """
-    child_pkg_attr_name = child_pkg.__name__.split(".")[-1]
-    setattr(parent_pkg, child_pkg_attr_name, child_pkg)
+        child_pkg_attr_name = child_pkg.__name__.split(".")[-1]
+        setattr(parent_pkg, child_pkg_attr_name, child_pkg)
 
-  set_child_as_subpackage()
-  set_child_as_attr()
+    set_child_as_subpackage()
+    set_child_as_attr()
