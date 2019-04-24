@@ -1,0 +1,1 @@
+from namespace_package_testing.version import version as __version__
