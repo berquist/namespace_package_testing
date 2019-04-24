@@ -14,16 +14,16 @@ setup(name='namespace_package_testing',
       author_email='berquist@isi.edu',
       description="A short description of the project",
       url='https://github.com/berquist/namespace-package-testing',
-      packages=[],
+      packages=find_packages(),
       # 3.6 and up, but not Python 4
       python_requires='~=3.6',
       install_requires=[
       ],
       scripts=[
-          ],
+      ],
       classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ]
-      )
+          "Programming Language :: Python :: 3",
+          "License :: OSI Approved :: MIT License",
+          "Operating System :: OS Independent",
+      ]
+)
