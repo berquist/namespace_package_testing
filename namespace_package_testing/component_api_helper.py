@@ -18,35 +18,39 @@ import importlib
 import os
 
 
-def package_hook(parent_package_str, child_package_str, error_msg=None):
+def package_hook(
+    parent_package_str: str, child_package_str: str, error_msg: str = None
+) -> None:
     """Used to hook in an external package into the TensorFlow namespace.
 
-  Example usage:
-  ### tensorflow/__init__.py
-  from tensorflow.python.tools import component_api_helper
-  component_api_helper.package_hook(
-      'tensorflow', 'tensorflow_estimator.python')
-  component_api_helper(
-      'tensorflow.contrib', 'tensorflow_estimator.contrib.python')
-  del component_api_helper
+    Example usage:
+    ### tensorflow/__init__.py
+    from tensorflow.python.tools import component_api_helper
+    component_api_helper.package_hook(
+        'tensorflow', 'tensorflow_estimator.python'
+    )
+    component_api_helper(
+        'tensorflow.contrib', 'tensorflow_estimator.contrib.python'
+    )
+    del component_api_helper
 
-  TODO(mikecase): This function has a minor issue, where if the child package
-  does not exist alone in its directory, sibling packages to it will also be
-  accessible from the parent. This is because we just add
-  `child_pkg.__file__/..` to the subpackage search path. This should not be
-  a big issue because of how our API generation scripts work (the child package
-  we are hooking up should always be alone). But there might be a better way
-  of doing this.
+    TODO(mikecase): This function has a minor issue, where if the child package
+    does not exist alone in its directory, sibling packages to it will also be
+    accessible from the parent. This is because we just add
+    `child_pkg.__file__/..` to the subpackage search path. This should not be
+    a big issue because of how our API generation scripts work (the child package
+    we are hooking up should always be alone). But there might be a better way
+    of doing this.
 
-  Args:
-    parent_package_str: Parent package name as a string such as 'tensorflow' or
-      'tensorflow.contrib'. This will become the parent package for the
-      component package being hooked in.
-    child_package_str: Child package name as a string such as
-      'tensorflow_estimator.python'. This package will be added as a subpackage
-      of the parent.
-    error_msg: Message to print if child package cannot be found.
-  """
+    Args:
+      parent_package_str: Parent package name as a string such as 'tensorflow' or
+        'tensorflow.contrib'. This will become the parent package for the
+        component package being hooked in.
+      child_package_str: Child package name as a string such as
+        'tensorflow_estimator.python'. This package will be added as a subpackage
+        of the parent.
+      error_msg: Message to print if child package cannot be found.
+    """
     parent_pkg = importlib.import_module(parent_package_str)
     try:
         child_pkg = importlib.import_module(child_package_str)
@@ -55,12 +59,12 @@ def package_hook(parent_package_str, child_package_str, error_msg=None):
             print(error_msg)
         return
 
-    def set_child_as_subpackage():
+    def set_child_as_subpackage() -> None:
         """Sets child package as a subpackage of parent package.
 
-    Will allow the following import statement to work.
-    >>> import parent.child
-    """
+        Will allow the following import statement to work.
+        >>> import parent.child
+        """
         child_pkg_path = [
             os.path.abspath(os.path.join(os.path.dirname(child_pkg.__file__), ".."))
         ]
@@ -69,13 +73,13 @@ def package_hook(parent_package_str, child_package_str, error_msg=None):
         except AttributeError:
             parent_pkg.__path__ = child_pkg_path
 
-    def set_child_as_attr():
+    def set_child_as_attr() -> None:
         """Sets child package as a attr of the parent package.
 
-    Will allow for the following.
-    >>> import parent
-    >>> parent.child
-    """
+        Will allow for the following.
+        >>> import parent
+        >>> parent.child
+        """
         child_pkg_attr_name = child_pkg.__name__.split(".")[-1]
         setattr(parent_pkg, child_pkg_attr_name, child_pkg)
 
