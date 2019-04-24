@@ -23,17 +23,17 @@ MYPY:=mypy $(MYPY_ARGS) $(SOURCE_DIR_NAME) tests benchmarks
 #
 # we tee the output to a file and test if it is empty so that we can return an error exit code
 # if there are errors (for CI) while still displaying them to the user
-FILTERED_MYPY:=$(MYPY) | perl -ne 'print if !/(Too many arguments|Signature of "__getitem__"|Only concrete class|Unexpected keyword argument|mypy\/typeshed\/stdlib\/3\/builtins.pyi:39: note: "\w+" defined here|Module( '\''\w+'\'')? has no attribute|has no attribute "validator"|has no attribute "default"|SelfType" has no attribute)/' | tee ./.mypy_tmp && test ! -s ./.mypy_tmp  
+FILTERED_MYPY:=$(MYPY) | perl -ne 'print if !/(Too many arguments|Signature of "__getitem__"|Only concrete class|Unexpected keyword argument|mypy\/typeshed\/stdlib\/3\/builtins.pyi:39: note: "\w+" defined here|Module( '\''\w+'\'')? has no attribute|has no attribute "validator"|has no attribute "default"|SelfType" has no attribute)/' | tee ./.mypy_tmp && test ! -s ./.mypy_tmp
 
 # this is the standard ignore list plus ignores for hanging indents, pending figuring out how to auto-format them
 FLAKE8:=flake8
 FLAKE8_CMD:=$(FLAKE8) $(SOURCE_DIR_NAME)
 
-test: 
-	pytest tests
+test:
+	pytest $(SOURCE_DIR_NAME)/tests
 
 coverage:
-	pytest --cov tests
+	pytest --cov=$(SOURCE_DIR_NAME) $(SOURCE_DIR_NAME)/tests
 
 lint:
 	$(PYLINT)
@@ -45,10 +45,10 @@ flake8:
 	$(FLAKE8_CMD)
 
 black-fix:
-	black $(SOURCE_DIR_NAME) tests benchmarks
+	black $(SOURCE_DIR_NAME) benchmarks
 
 black-check:
-	black --check $(SOURCE_DIR_NAME) tests benchmarks
+	black --check $(SOURCE_DIR_NAME) benchmarks
 
 check: black-check lint mypy flake8
 
